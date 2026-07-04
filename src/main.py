@@ -9,6 +9,7 @@ from src.config import BOT_TOKEN
 from src.db import engine
 from src.models import Base
 from src.handlers import start, booking
+from scripts.seed_demo import seed as seed_demo
 
 dp = Dispatcher()
 dp.include_router(start.router)
@@ -18,6 +19,7 @@ dp.include_router(booking.router)
 async def on_startup(bot: Bot) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await seed_demo()
 
 
 async def main() -> None:

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: beauty-salon-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m src.main
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_CHAT_ID
+        sync: false
+      - key: DB_PATH
+        value: salon.db
+      - key: PORT
+        value: 8080
+      - key: WEBHOOK_PATH
+        value: /webhook

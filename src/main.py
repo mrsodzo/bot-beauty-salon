@@ -7,7 +7,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
-from src.config import BOT_TOKEN, PORT, WEBHOOK_PATH
+from src.config import BOT_TOKEN, PORT, WEBHOOK_PATH, WEBHOOK_URL
 from src.db import engine
 from src.models import Base
 from src.handlers import start, booking
@@ -22,6 +22,9 @@ async def on_startup(bot: Bot) -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     await seed_demo()
+    if WEBHOOK_URL:
+        await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=False)
+        print(f"Webhook set to {WEBHOOK_URL}")
 
 
 async def on_shutdown(bot: Bot) -> None:

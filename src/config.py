@@ -13,6 +13,10 @@ BOT_TOKEN = os.environ["BOT_TOKEN"]
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "0"))
 PORT = int(os.getenv("PORT", "8080"))
 WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/webhook")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+_RENDER_URL = os.getenv("RENDER_EXTERNAL_URL")
+if not WEBHOOK_URL and _RENDER_URL:
+    WEBHOOK_URL = _RENDER_URL + WEBHOOK_PATH
 
 SALON_NAME = "Barber Studio"
 SALON_ADDRESS = "ул. Примерная, д. 1"

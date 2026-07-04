@@ -74,6 +74,7 @@ ADMIN_CHAT_ID=123456789
 DB_PATH=salon.db
 PORT=8080
 WEBHOOK_PATH=/webhook
+WEBHOOK_URL=https://your-domain.com/webhook
 ```
 
 - `BOT_TOKEN` — токен бота от @BotFather
@@ -81,6 +82,7 @@ WEBHOOK_PATH=/webhook
 - `DB_PATH` — путь к SQLite БД
 - `PORT` — порт веб-сервера
 - `WEBHOOK_PATH` — путь вебхука Telegram
+- `WEBHOOK_URL` — полный URL вебхука (обязательно для локального запуска)
 
 ---
 
@@ -113,7 +115,7 @@ python -m src.main
 - **Build Command**: `pip install -r requirements.txt`
 - **Start Command**: `python -m src.main`
 - Переменные окружения: `BOT_TOKEN`, `ADMIN_CHAT_ID`, `DB_PATH`, `PORT`, `WEBHOOK_PATH`
-- В BotFather настроить `/setwebhook` на `<RENDER_URL>/webhook`
+- В BotFather достаточно один раз зарегистрировать бота токеном; вебхук устанавливается автоматически при старте через переменную `RENDER_EXTERNAL_URL`.
 
 Это предотвращает “засыпание” инстанса Render, так как запросы от Telegram регулярно приходят по вебхуку.
 

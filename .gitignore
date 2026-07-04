@@ -1,0 +1,11 @@
+__pycache__/
+*.egg-info/
+.eggs/
+dist/
+build/
+.env
+venv/
+.venv/
+salon.db
+*.mp4
+*.gif

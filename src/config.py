@@ -10,7 +10,9 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = os.getenv("DB_PATH", str(BASE_DIR / "salon.db"))
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-ADMIN_CHAT_ID = int(os.environ.get("ADMIN_CHAT_ID", "0"))
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "0"))
+PORT = int(os.getenv("PORT", "8080"))
+WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/webhook")
 
 SALON_NAME = "Barber Studio"
 SALON_ADDRESS = "ул. Примерная, д. 1"

@@ -29,13 +29,21 @@ def service_kb(services: list) -> InlineKeyboardMarkup:
     ])
 
 
-def date_kb(dates: list[str]) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=d, callback_data=f"date_{d}")]
-        for d in dates
-    ] + [
-        [InlineKeyboardButton(text="Назад", callback_data="back_service")]
+def date_kb(dates: list[tuple[str, bool]]) -> InlineKeyboardMarkup:
+    keyboard = []
+    for d, is_available in dates:
+        if is_available:
+            keyboard.append([
+                InlineKeyboardButton(text=d, callback_data=f"date_{d}")
+            ])
+        else:
+            keyboard.append([
+                InlineKeyboardButton(text=f"⛔ {d}")
+            ])
+    keyboard.append([
+        InlineKeyboardButton(text="Назад", callback_data="back_service")
     ])
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
 
 def time_kb(slots: list[tuple]) -> InlineKeyboardMarkup:

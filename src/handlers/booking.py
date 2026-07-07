@@ -15,7 +15,7 @@ from src.keyboards import (
     confirm_kb,
     main_kb,
 )
-from src.utils import next_dates, free_slots_for
+from src.utils import available_dates, free_slots_for
 from src.config import SALON_ADDRESS, ADMIN_CHAT_ID
 from src.services.admin_notifier import notify_admin
 from datetime import datetime as datetime_cls, date as date_cls
@@ -67,7 +67,8 @@ async def handle_service(call: CallbackQuery, state: FSMContext):
     service_id = int(call.data.split("_", 1)[1])
     await state.update_data(service_id=service_id)
 
-    dates = next_dates(5)
+    data = await state.get_data()
+    dates = await available_dates(5, data.get("master_id"))
     await call.message.edit_text("Выберите дату:", reply_markup=date_kb(dates))
     await state.set_state(BookingState.date)
     await call.answer()
@@ -118,7 +119,11 @@ async def handle_date(call: CallbackQuery, state: FSMContext):
 
 @router.callback_query(BookingState.time, F.data == "back_date")
 async def back_to_date(call: CallbackQuery, state: FSMContext):
-    await call.message.edit_text("Выберите дату:", reply_markup=date_kb(next_dates(5)))
+    data = await state.get_data()
+    await call.message.edit_text(
+        "Выберите дату:",
+        reply_markup=date_kb(await available_dates(5, data.get("master_id")))
+    )
     await state.set_state(BookingState.date)
     await call.answer()
 

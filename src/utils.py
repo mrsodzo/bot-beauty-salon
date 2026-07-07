@@ -14,6 +14,16 @@ def next_dates(n: int = 5) -> list[str]:
     return [(today + timedelta(days=i + 1)).strftime("%d.%m") for i in range(n)]
 
 
+async def available_dates(n: int = 5, master_id: int | None = None) -> list[tuple[str, bool]]:
+    result = []
+    today = date.today()
+    for i in range(n):
+        d = today + timedelta(days=i + 1)
+        slots = await free_slots_for(d, master_id)
+        result.append((d.strftime("%d.%m"), len(slots) > 0))
+    return result
+
+
 async def free_slots_for(
     selected_date: date, master_id: int | None = None
 ) -> list[tuple[str, str, int, int]]:

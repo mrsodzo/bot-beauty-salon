@@ -97,7 +97,7 @@ async def handle_date(call: CallbackQuery, state: FSMContext):
 
     today = date_cls.today()
     try:
-        month, day = map(int, date_str.split("."))
+        day, month = map(int, date_str.split("."))
         selected_date = date_cls(today.year, month, day)
         if selected_date < today:
             selected_date = selected_date.replace(year=today.year + 1)
@@ -191,7 +191,7 @@ async def confirm_booking(call: CallbackQuery, state: FSMContext, bot):
     data = await state.get_data()
 
     today = date_cls.today()
-    month, day = map(int, data["date"].split("."))
+    day, month = map(int, data["date"].split("."))
     booking_date = date_cls(today.year, month, day)
     if booking_date < today:
         booking_date = booking_date.replace(year=today.year + 1)

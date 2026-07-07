@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import random
 from datetime import date, timedelta, time as dtime
 
@@ -9,10 +10,14 @@ from src.db import engine, AsyncSessionLocal
 from src.models import Base, Master, Service, Slot
 from sqlalchemy import select, func, delete
 
+logger = logging.getLogger(__name__)
+
 
 async def seed() -> None:
+    logger.info("Создание базы данных...")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    logger.info("База данных создана.")
 
     async with AsyncSessionLocal() as session:
         masters = [
@@ -52,6 +57,7 @@ async def seed() -> None:
         )
         await session.commit()
 
+        created = []
         for master_id in master_ids:
             for future in range(1, 6):
                 slot_date = today + timedelta(days=future)
@@ -64,10 +70,17 @@ async def seed() -> None:
                         time_start=dtime(hour, 0),
                         is_booked=False,
                     ))
+                    created.append((master_id, slot_date, dtime(hour, 0)))
 
         await session.commit()
 
-    print("Demo data seeded.")
+        for master_id, slot_date, time_start in created:
+            master_name = {1: "Алексей", 2: "Максим", 3: "Лев"}.get(master_id, str(master_id))
+            logger.info("Создан слот: %s | %s | %s", master_name, slot_date.strftime("%d.%m"), time_start.strftime("%H:%M"))
+
+        logger.info("Всего создано слотов: %s", len(created))
+
+    logger.info("Demo data seeded.")
 
 
 if __name__ == "__main__":

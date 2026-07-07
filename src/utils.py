@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import logging
 from datetime import date, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from src.db import AsyncSessionLocal
 from src.models import Slot
+
+logger = logging.getLogger(__name__)
 
 
 def next_dates(n: int = 5) -> list[str]:
@@ -20,6 +23,7 @@ async def available_dates(n: int = 5, master_id: int | None = None) -> list[tupl
         d = today + timedelta(days=i + 1)
         slots = await free_slots_for(d, master_id)
         result.append((d.strftime("%d.%m"), len(slots) > 0))
+    logger.info("available_dates master_id=%s %s", master_id, result)
     return result
 
 
@@ -48,4 +52,5 @@ async def free_slots_for(
                 slot.master_id,
                 slot.id,
             ))
+        logger.info("free_slots_for date=%s master_id=%s count=%s", selected_date, master_id, len(slots))
         return sorted(slots, key=lambda x: x[0])

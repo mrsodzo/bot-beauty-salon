@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import random
 from datetime import date, timedelta, time as dtime
 
-from src.config import SALON_NAME
+from src.config import SALON_NAME, WORK_START, WORK_END
 from src.db import engine, AsyncSessionLocal
 from src.models import Base, Master, Service, Slot
-from sqlalchemy import select, func
+from sqlalchemy import select, func, delete
 
 
 async def seed() -> None:
@@ -14,11 +15,6 @@ async def seed() -> None:
         await conn.run_sync(Base.metadata.create_all)
 
     async with AsyncSessionLocal() as session:
-        existing = (await session.execute(select(func.count(Master.id)))).scalar_one()
-        if existing > 0:
-            print("Demo data already seeded.")
-            return
-
         masters = [
             {"name": "Алексей", "description": "Стрижки и укладки", "is_active": True},
             {"name": "Максим", "description": "Окрашивание и уход", "is_active": True},
@@ -37,25 +33,37 @@ async def seed() -> None:
         ]
 
         for m in masters:
-            session.add(Master(**m))
+            stmt = select(Master).where(Master.name == m["name"])
+            if not (await session.execute(stmt)).first():
+                session.add(Master(**m))
 
         for name, price, duration, master_id in services:
-            session.add(
-                Service(name=name, price=price, duration_min=duration, master_id=master_id)
-            )
+            stmt = select(Service).where(Service.name == name)
+            if not (await session.execute(stmt)).first():
+                session.add(Service(name=name, price=price, duration_min=duration, master_id=master_id))
 
-        for master_id in range(1, 4):
+        await session.commit()
+
+        master_ids = [m.id for m in (await session.execute(select(Master))).scalars().all()]
+        today = date.today()
+
+        await session.execute(
+            delete(Slot).where(Slot.is_booked == False, Slot.date >= today)
+        )
+        await session.commit()
+
+        for master_id in master_ids:
             for future in range(1, 6):
-                slot_date = date.today() + timedelta(days=future)
-                for hour in range(10, 19):
-                    session.add(
-                        Slot(
-                            master_id=master_id,
-                            date=slot_date,
-                            time_start=dtime(hour, 0),
-                            is_booked=False,
-                        )
-                    )
+                slot_date = today + timedelta(days=future)
+                available_hours = list(range(WORK_START, WORK_END))
+                random.shuffle(available_hours)
+                for hour in available_hours[:random.randint(1, 3)]:
+                    session.add(Slot(
+                        master_id=master_id,
+                        date=slot_date,
+                        time_start=dtime(hour, 0),
+                        is_booked=False,
+                    ))
 
         await session.commit()
 

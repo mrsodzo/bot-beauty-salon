@@ -38,7 +38,7 @@ def date_kb(dates: list[tuple[str, bool]]) -> InlineKeyboardMarkup:
             ])
         else:
             keyboard.append([
-                InlineKeyboardButton(text=f"⛔ {d}")
+                InlineKeyboardButton(text=d)
             ])
     keyboard.append([
         InlineKeyboardButton(text="Назад", callback_data="back_service")
